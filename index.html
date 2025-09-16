@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="description"
+    content="HySUP-V: Quality-Aware 3D Vietnamese Sign Language Reconstruction with Anchor-Guided Kinematic Fusion">
+  <meta name="keywords"
+    content="sign language, 3D human reconstruc- tion, SMPL-X, FLAME, hands, IQA, interpolation, temporal smoothing">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HySUP-V: Quality-Aware 3D Vietnamese Sign Language Reconstruction with Anchor-Guided Kinematic Fusion</title>
+
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-PYVRSFMDRL"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', 'G-PYVRSFMDRL');
+  </script>
+
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro" rel="stylesheet">
+  <link rel="stylesheet" href="./static/css/bulma.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-carousel.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-slider.min.css">
+  <link rel="stylesheet" href="./static/css/index.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <link rel="icon" href="./static/images/favicon.svg">
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script defer src="./static/js/fontawesome.all.min.js"></script>
+  <script src="./static/js/bulma-carousel.min.js"></script>
+  <script src="./static/js/bulma-slider.min.js"></script>
+  <script src="./static/js/index.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <script>
+    MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']]
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+</head>
+
+<body>
+
+  <section class="hero is-small">
+    <div class="hero-body">
+      <div class="container is-max-desktop">
+        <div class="columns is-centered">
+          <div class="column has-text-centered">
+            <h1 class="title is-3 publication-title">HySUP-V: Quality-Aware 3D Vietnamese Sign Language Reconstruction
+              with Anchor-Guided Kinematic Fusion</h1>
+
+            <div class="is-size-6 publication-authors">
+              <!-- <span class="author-block"><a>Le&nbsp;Cong&nbsp;Thuong</a><sup>1</sup></span>
+              <span class="author-block"><a>Quang&nbsp;Nguyen&nbsp;Viet</a><sup>1</sup></span>
+              <span class="author-block"><a>Hai-Chau&nbsp;Nguyen-Le</a><sup>1</sup></span>
+              <span class="author-block"><a>Thanh&nbsp;Ha&nbsp;Le</a><sup>1§</sup></span> -->
+            </div>
+
+            <div class="is-size-7 publication-authors">
+              <!-- <span class="author-block"><sup>1</sup>Faculty of Information Technology, University of Engineering and Technology, Hanoi, Vietnam</span>
+              <span class="author-block"><sup>§</sup>Corresponding author: ltha@vnu.edu.vn</span> -->
+            </div>
+
+            <div class="publication-links">
+              <span class="link-block">
+                <a href="https://drive.google.com/file/d/1vPKid4aw9nZ4k9hWH1UwLyeLmB6xZ4pP/view?usp=sharing"
+                  class="external-link button is-normal is-rounded is-dark" target="_blank">
+                  <span class="icon is-small"><i class="fas fa-file-pdf" style="color:white;"></i></span>
+                  <span>Paper</span>
+                </a>
+              </span>
+              <span class="link-block">
+                <a href="/" class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon"><i class="fab fa-github"></i></span>
+                  <span>Code (Coming soon)</span>
+                </a>
+              </span>
+              <span class="link-block">
+                <a href="/" class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon"><i class="fab fa-github"></i></span>
+                  <span>Dataset (Coming soon)</span>
+                </a>
+              </span>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- VIDEO COMPARISON -->
+  <section class="section">
+    <div class="container is-max-desktop">
+      <h2 class="title is-3 has-text-centered">Video Comparison</h2>
+      <div id="video-compare-container"
+        style="position: relative; width: 100%; max-width: 900px; margin: 40px auto; height: 480px; overflow: hidden;">
+        <video id="video-original" src="static/videos/D0077B_2D.webm" autoplay loop muted
+          style="position: absolute; width: 100%; height: 100%; object-fit: cover; clip-path: inset(0 50% 0 0);">
+        </video>
+        <video id="video-3d" src="static/videos/D0077B_3D.webm" autoplay loop muted
+          style="position: absolute; width: 100%; height: 100%; object-fit: cover; clip-path: inset(0 0 0 50%);">
+        </video>
+        <div id="slider"
+          style="position: absolute; top: 0; bottom: 0; left: 50%; width: 8px; background: #fff; border-radius: 4px; box-shadow: 0 0 8px #888; cursor: ew-resize; z-index: 10;">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    const slider = document.getElementById('slider');
+    const videoOriginal = document.getElementById('video-original');
+    const video3d = document.getElementById('video-3d');
+    let dragging = false;
+
+    slider.addEventListener('mousedown', () => {
+      dragging = true;
+      document.body.style.cursor = 'ew-resize';
+    });
+
+    window.addEventListener('mouseup', () => {
+      dragging = false;
+      document.body.style.cursor = '';
+    });
+
+    window.addEventListener('mousemove', (e) => {
+      if (!dragging) return;
+      const container = document.getElementById('video-compare-container');
+      const rect = container.getBoundingClientRect();
+      let x = e.clientX - rect.left;
+      x = Math.max(0, Math.min(x, rect.width));
+      const percent = (x / rect.width) * 100;
+      slider.style.left = `${percent}%`;
+      videoOriginal.style.clipPath = `inset(0 ${100 - percent}% 0 0)`;
+      video3d.style.clipPath = `inset(0 0 0 ${percent}%)`;
+    });
+  </script>
+
+  <section class="section">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-four-fifths">
+          <h2 class="title is-3">Abstract</h2>
+          <div class="content has-text-justified">
+            <p>
+              Reconstructing expressive 3D signing mo- tion from in-the-wild monocular video remains difficult due to
+              motion blur, compression artifacts, frequent hand and face occlusions. These degradations make standard
+              pipelines temporally unstable and prone to losing fine articulator detail. We introduce
+              <strong>HySUP-V</strong>, a reliability-aware framework that assesses and manages visual evidence quality
+              across sequences. In Stage I (EQA), we score part-level image quality to select high- fidelity anchor
+              frames as references. In Stage II (AKF), we enforce shape consistency by fusing specialized hand (MANO)
+              and face (FLAME) estimates into a unified SMPL-X model and use geodesic pose transport to bridge degraded
+              frames. Applying HySUP-V, we curate VSL-3D, a public dataset of 1,540 Vietnamese Sign Language clips with
+              expressive SMPL-X parameters. Human evaluations yield a Mean Opinion Score of 3.47/5, plausible
+              reconstructions with strong semantic preser- vation and hand accuracy, while highlighting remaining
+              challenges in facial detail and motion naturalness.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-four-fifths">
+          <h2 class="title is-3">Problem Statement</h2>
+          <div class="content has-text-justified">
+            <p>
+              Reconstructing 3D motion from 2D video is challenging, especially for Vietnamese Sign Language where fast
+              hand and facial movements suffer from blur and occlusion. Existing models either miss fine details or
+              struggle to fuse body, hand, and face, highlighting the need for more reliable 3D reconstruction methods.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="columns is-centered">
+        <div class="column is-four-fifths">
+          <figure class="image">
+            <img src="./static/images/problem-statement.png" alt="Blur compromises 3D reconstruction.">
+          </figure>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered">
+        <div class="column has-text-centered">
+          <h2 class="title is-3">Our Method</h2>
+        </div>
+      </div>
+
+      <p class="margin-bottom-20">
+        Our method is designed to explicitly address this by first identifying trustworthy temporal anchors and then
+        leveraging them to guide a temporally coherent and kinematically consistent reconstruction. The framework
+        comprises two main stages: Stage I, Evidence Quality Assessment (EQA), which analyzes per-frame data quality,
+        and Stage II, Anchor-Guided Kinematic Fusion (AKF), which uses this quality information to regularize and
+        refine the final 3D output. Our goal is to recover the parameters of an expres- sive SMPL-X body model from a
+        sequence of images {It}T t=1. This includes a single, sequence-level shape vector β to represent identity, and
+        per-frame parameters for pose θt, expression ψt, and translation tt. We leverage specialized part models—MANO
+        for hands and FLAME for faces.
+      </p>
+      <div class="width-80">
+        <figure class="image" style="width: 90%; margin: auto;">
+          <img src="./static/images/po16.png" alt="Overview of HySUP-V pipeline.">
+        </figure>
+        <div class="content has-text-justified">
+        </div>
+      </div>
+
+      <!-- <div class="columns is-vcentered has-text-centered" style="margin-top: 2rem; margin-bottom: 2rem;">
+        <div class="column">
+          <div class="box">
+            <span class="icon is-large has-text-info"><i class="fas fa-user fa-2x"></i></span>
+            <h4 class="title is-5" style="margin-top: 1rem;">1. Shape Optimization</h4>
+            <p>Isolates identity by fitting SMPL-X shape parameters ($\beta$) to the target face in a neutral T-pose.
+            </p>
+          </div>
+        </div>
+        <div class="column is-1 has-text-centered">
+          <span class="icon is-large"><i class="fas fa-arrow-right"></i></span>
+        </div>
+        <div class="column">
+          <div class="box">
+            <span class="icon is-large has-text-warning"><i class="fas fa-smile fa-2x"></i></span>
+            <h4 class="title is-5" style="margin-top: 1rem;">2. Expression-Pose Optimization</h4>
+            <p>Transfers the expression by fitting facial pose ($\theta_{\mathcal{E}}$) and expression ($\psi$)
+              parameters to the expressive target.</p>
+          </div>
+        </div>
+      </div> -->
+      <div class="content has-text-justified">
+        <!-- <p>
+          In both stages, we minimize the vertex-level discrepancy between corresponding facial regions. To ensure the
+          error reflects only local geometric differences, not global transformations, we first align the vertex sets
+          using the Umeyama algorithm. Regularization terms are also applied to ensure plausible facial shapes and
+          expressions, governed by the loss functions $\mathcal{L}_{\text{shape}}$ and $\mathcal{L}_{\text{expr/pose}}$.
+        </p> -->
+      </div>
+    </div>
+  </section>
+  <section class="section">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered">
+        <div class="column has-text-centered">
+          <h2 class="title is-3">Dataset and Evaluation</h2>
+        </div>
+      </div>
+      <div class="columns is-centered">
+        <div class="column">
+          <h3 class="title is-4 has-text-centered">Dataset</h3>
+          <p class="content has-text-justified">
+            We apply HySUP-V to Vietnamese Sign Language (VSL) dictionary videos curated under the QIPEDC initiative.
+            We process 1,540 videos into full 3D motion sequences with per-frame SMPL-X parameters \( (\beta;\
+            \{\psi_t,\ \theta_t,\ t_t\}_{t=1}^{T-1}) \). Examples of the resulting 3D reconstructions are shown below
+          </p>
+          <div class="publication-video">
+            <figure class="image">
+              <img src="./static/images/3d_example.webp" alt="Examples of the resulting 3D reconstructions">
+            </figure>
+          </div>
+        </div>
+      </div>
+      <div class="columns is-centered">
+        <div class="column">
+          <h3 class="title is-4 has-text-centered">Subjective Evaluation</h3>
+          <p class="content has-text-justified">
+            We conducted a subjective evaluation with four raters trained in sign language who assessed 25
+            reconstructed VSL clips. Using a 5-point Likert scale, they scored each clip on four criteria:
+            comprehensibility, hand-gesture accuracy, naturalness of motion, and facial expressions. The results below
+            are presented by criterion (Table I) and by type (Table II).
+          </p>
+          <div class="publication-video">
+            <!-- Table I -->
+            <p class="is-4 has-text-centered" style="font-size: 20px; font-weight: bold;">
+              Table II : Average scores per Criterion (1–5 Likert scale)
+            </p>
+            <table class="table is-bordered is-striped is-hoverable"
+              style="width:50%; margin:auto; margin-bottom:30px;">
+              <tr>
+                <th>Criterion</th>
+                <th>Mean</th>
+              </tr>
+              <tr>
+                <td>Comprehensibility</td>
+                <td><b>3.94</b></td>
+              </tr>
+              <tr>
+                <td>Hand gesture accuracy</td>
+                <td>3.39</td>
+              </tr>
+              <tr>
+                <td>Naturalness of motion</td>
+                <td>3.34</td>
+              </tr>
+              <tr>
+                <td>Facial expression</td>
+                <td>3.20</td>
+              </tr>
+              <tr>
+                <td><b>Overall</b></td>
+                <td>3.47</td>
+              </tr>
+            </table>
+
+            <!-- Table II -->
+            <p class="is-4 has-text-centered" style="font-size: 20px; font-weight: bold;">
+              Table II : Average scores per Sign type (1–5 Likert scale)
+            </p>
+            <table class="table is-bordered is-striped is-hoverable is-fullwidth">
+              <thead class="has-text-centered">
+                <tr>
+                  <th>Type</th>
+                  <th>Comprehensibility</th>
+                  <th>Hand gesture accuracy</th>
+                  <th>Naturalness of motion</th>
+                  <th>Facial expressions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>(i) Direct pointing</strong></td>
+                  <td>3.50</td>
+                  <td>2.81</td>
+                  <td>2.75</td>
+                  <td>2.50</td>
+                </tr>
+                <tr>
+                  <td><strong>(ii) Simulation</strong></td>
+                  <td>3.80</td>
+                  <td>3.60</td>
+                  <td>3.45</td>
+                  <td>2.15</td>
+                </tr>
+                <tr>
+                  <td><strong>(iii) Reflection and Analysis of characteristics</strong></td>
+                  <td>3.67</td>
+                  <td>2.75</td>
+                  <td>3.00</td>
+                  <td>3.67</td>
+                </tr>
+                <tr>
+                  <td><strong>(iv) Derivatives</strong></td>
+                  <td>3.50</td>
+                  <td>2.88</td>
+                  <td>2.81</td>
+                  <td>1.94</td>
+                </tr>
+                <tr>
+                  <td><strong>(v) Borrow</strong></td>
+                  <td>3.88</td>
+                  <td>2.88</td>
+                  <td>2.81</td>
+                  <td>4.06</td>
+                </tr>
+                <tr>
+                  <td><strong>(vi) Finger letters and numbers</strong></td>
+                  <td>5.00</td>
+                  <td>4.85</td>
+                  <td>4.75</td>
+                  <td>4.85</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- <section class="section" id="BibTeX">
+    <div class="container is-max-desktop content">
+      <h2 class="title has-text-centered">BibTeX</h2>
+      <pre><code>@inproceedings{hysupf2025,
+  author    = {Le Cong Thuong and Quang Nguyen Viet and Hai-Chau Nguyen-Le and Thanh Ha Le},
+  title     = {HySUP-F: Face-Enhanced Full-Body Reconstruction from a Single Image},
+  booktitle = {Proceedings of the 17th International Conference on Knowledge and Systems Engineering (KSE)},
+  year      = {2025}
+}</code></pre>
+    </div>
+  </section> -->
+
+  <footer class="footer">
+    <div class="container">
+      <div class="columns is-centered">
+        <div class="column is-8">
+          <div class="content">
+            <p>This website is licensed under a <a rel="license"
+                href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0
+                International License</a>.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+</body>
+
+</html>
