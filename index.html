@@ -25,7 +25,7 @@
   <link rel="stylesheet" href="./static/css/index.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
-  <link rel="icon" href="./static/images/favicon.svg">
+  <link rel="icon" href="./static/images/favicon.ico">
 
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <script defer src="./static/js/fontawesome.all.min.js"></script>
@@ -381,6 +381,96 @@
     </div>
   </section>
 
+  <section class="section">
+    <div class="container is-max-desktop">
+      <h2 class="title is-3 has-text-centered">Examples</h2>
+      <div class="columns is-multiline is-centered">
+
+        <!-- Video 1 -->
+        <div class="column is-half">
+          <div class="video-compare-container">
+            <video src="static/videos/D0031B_2D.webm" autoplay loop muted
+              style="position: absolute; width: 100%; height: 100%; object-fit: cover; clip-path: inset(0 50% 0 0);">
+            </video>
+            <video src="static/videos/D0031B_3D.webm" autoplay loop muted
+              style="position: absolute; width: 100%; height: 100%; object-fit: cover; clip-path: inset(0 0 0 50%);">
+            </video>
+            <div class="slider"></div>
+          </div>
+        </div>
+
+        <!-- Video 2 -->
+        <div class="column is-half">
+          <div class="video-compare-container">
+            <video src="static/videos/D0033B_2D.webm" autoplay loop muted
+              style="position: absolute; width: 100%; height: 100%; object-fit: cover; clip-path: inset(0 50% 0 0);">
+            </video>
+            <video src="static/videos/D0033B_3D.webm" autoplay loop muted
+              style="position: absolute; width: 100%; height: 100%; object-fit: cover; clip-path: inset(0 0 0 50%);">
+            </video>
+            <div class="slider"></div>
+          </div>
+        </div>
+
+        <!-- Video 3 -->
+        <div class="column is-half">
+          <div class="video-compare-container">
+            <video src="static/videos/D0489_2D.webm" autoplay loop muted
+              style="position: absolute; width: 100%; height: 100%; object-fit: cover; clip-path: inset(0 50% 0 0);">
+            </video>
+            <video src="static/videos/D0489_3D.webm" autoplay loop muted
+              style="position: absolute; width: 100%; height: 100%; object-fit: cover; clip-path: inset(0 0 0 50%);">
+            </video>
+            <div class="slider"></div>
+          </div>
+        </div>
+
+        <!-- Video 4 -->
+        <div class="column is-half">
+          <div class="video-compare-container">
+            <video src="static/videos/W01112_2D.webm" autoplay loop muted
+              style="position: absolute; width: 100%; height: 100%; object-fit: cover; clip-path: inset(0 50% 0 0);">
+            </video>
+            <video src="static/videos/W01112_3D.webm" autoplay loop muted
+              style="position: absolute; width: 100%; height: 100%; object-fit: cover; clip-path: inset(0 0 0 50%);">
+            </video>
+            <div class="slider"></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+  <script>
+    document.querySelectorAll('.video-compare-container').forEach(container => {
+      const slider = container.querySelector('.slider');
+      const videoOriginal = container.querySelector('video:nth-child(1)');
+      const video3d = container.querySelector('video:nth-child(2)');
+      let dragging = false;
+
+      slider.addEventListener('mousedown', () => {
+        dragging = true;
+        document.body.style.cursor = 'ew-resize';
+      });
+
+      window.addEventListener('mouseup', () => {
+        dragging = false;
+        document.body.style.cursor = '';
+      });
+
+      window.addEventListener('mousemove', (e) => {
+        if (!dragging) return;
+        const rect = container.getBoundingClientRect();
+        let x = e.clientX - rect.left;
+        x = Math.max(0, Math.min(x, rect.width));
+        const percent = (x / rect.width) * 100;
+        slider.style.left = `${percent}%`;
+        videoOriginal.style.clipPath = `inset(0 ${100 - percent}% 0 0)`;
+        video3d.style.clipPath = `inset(0 0 0 ${percent}%)`;
+      });
+    });
+  </script>
+
   <!-- <section class="section" id="BibTeX">
     <div class="container is-max-desktop content">
       <h2 class="title has-text-centered">BibTeX</h2>
@@ -392,6 +482,8 @@
 }</code></pre>
     </div>
   </section> -->
+
+
 
   <footer class="footer">
     <div class="container">
@@ -411,5 +503,3 @@
 
 
 </html>
-
-
